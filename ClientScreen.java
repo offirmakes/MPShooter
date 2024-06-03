@@ -968,8 +968,9 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
         rotatedPistol = transform(pistol, p1.getMouseAngle());
         rotatedSword = transform(sword, p1.getMouseAngle());
         rotatedSniper = transform(sniper, p1.getMouseAngle());
+        selectedUserName = true;
         
-        startBtn.setEnabled(true); // Enables all menu buttons and fields
+        startBtn.setEnabled(false); // Enables all menu buttons and fields
         startBtn.setVisible(true);
         sendMessage(MessagesIds.PLAYER_UNREADY, null);
         sendMessage(MessagesIds.PLAYER_COUNT, null);
@@ -1279,7 +1280,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                             p1.setPrimaryDamge(40);
                             p1.setSecondaryDamage(40);
                             p1.setUltDamage(20);
-                            p1.setMaxHealth(175);
+                            p1.setMaxHealth(160);
                             p1.setCurrentHealth(p1.getMaxHealth());
                             p1.setFireCooldown(1);
                             p1.setUltCooldown(25);
@@ -1655,6 +1656,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
         }
 	}
     public void shootSword(){
+        playSound("Audio/KnifeAudio.wav");
         weaponTime = 0;
         int minWeaponOffset = 50;
         int maxWeaponOffset = 73;
