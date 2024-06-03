@@ -926,9 +926,22 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
             g.setFont(new Font("Arial", Font.PLAIN, 20));
             if (p1.getHeroType() == 1){
                 g.drawString("Dagger Slash: Hold Left Click", 540, 470);
-                g.drawString("Dagger Throw: Hold and Release Shift or Right Click", 440, 500);
+                g.drawString("Dagger Throw: Press Shift or Right Click", 480, 500);
                 g.drawString("Dash: Press Q", 580, 530);
                 g.drawString("Invisibility: Press E", 560, 560);
+            } else if (p1.getHeroType() == 2){
+                g.drawString("Sword Slash: Hold Left Click", 540, 470);
+                g.drawString("Sword Launch: Hold and Release Shift or Right Click", 440, 500);
+                g.drawString("Shield: Press Q", 580, 530);
+                g.drawString("Rage: Press E", 585, 560);
+            } else if (p1.getHeroType() == 3){
+                g.drawString("Pistol Shot: Hold Left Click", 540, 470);
+                g.drawString("Grenade: Press Q", 580, 500);
+                g.drawString("Machine Gun: Press E", 560, 530);
+            } else if (p1.getHeroType() == 4){
+                g.drawString("Sniper Shot: Hold Left Click", 540, 470);
+                g.drawString("Poison: Press Q", 580, 500);
+                g.drawString("KnockBack: Press E", 565, 530);
             }
             
             g.drawImage(dagger, 415, 253, null); // Weapon images
