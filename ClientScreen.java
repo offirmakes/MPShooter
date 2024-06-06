@@ -42,7 +42,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
     private ObjectInputStream inObj;
     private boolean up, down, right, left;
     private int grenadeID;
-    private double weaponOffset;
+    private double weaponOffset, currentPullOffset;
     private double weaponCooldownHit, weaponCooldownThrow, weaponThrowAnimationTime;
     private String poisonUsername;
     private int period;
@@ -236,6 +236,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
         regularAbilityHeld = false;
         poisonActive = false;
         weaponOffset = 73;
+        currentPullOffset = 73;
         weaponTime = 0;
         dashTime = 0;
         recoilTime = 0;
@@ -285,6 +286,9 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
     }
     public void close(){
         if (gameStart){
+            if (playersAlive <= 1){
+                sendMessage(MessagesIds.GAME_RESET, null);
+            }
             sendMessage(MessagesIds.EXIT, p1.getUsername());
         } else {
             sendMessage(MessagesIds.EXIT, null);
@@ -634,9 +638,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                             }
                             if (p1.getCurrentHealth() <= 0 && !playerSpectatingFound){
                                 playerSpectatingFound = true;
-                                p1.setPlayerSpectating(currentPlayer.getUsername());
-                                p1.setAlive(false);
-                                sendMessage(MessagesIds.PLAYER_DEAD, currentPlayer.getUsername());
+                                playerDied(currentPlayer.getUsername());
                             }
                         } else {       
                             if (distanceBetweenObjects(p1.getMapX(), currentPlayer.getMapX(), p1.getMapY(), currentPlayer.getMapY()) < 200){
@@ -877,13 +879,19 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
             g.setFont(new Font("Arial", Font.BOLD, 23));
             g.drawString("Players Remaining: " + playersAlive, 15, 30);
             g.drawString("Total Elimination: " + p1.getTotalElim(), 1035, 30);
-            if (playersAlive == 1){
+            if (playersAlive <= 1){
                 g.setColor(Color.YELLOW);
                 g.setFont(new Font("Arial", Font.BOLD, 30));
-                g.drawString(playerAliveUsername + " Won!", 587 - playerAliveUsername.length()*7, 200);
+                if (playersAlive == 1){
+                    g.drawString(playerAliveUsername + " Won!", 587 - playerAliveUsername.length()*7, 200);
+                } else {
+                    g.setColor(Color.WHITE);
+                    g.drawString("Draw", 600, 200);
+                }
+                g.setColor(Color.YELLOW);
                 g.drawString(Integer.toString((int)Math.ceil(cooldown.getGameOverCooldown())), 635, 250);
             }
-            if ((cooldown.getGameOverCooldown() <= 0 && gameOver) || playersAlive < 1){
+            if (cooldown.getGameOverCooldown() <= 0 && gameOver){
                 resetGame();
             }
         }
@@ -974,6 +982,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
         startBtn.setVisible(true);
         sendMessage(MessagesIds.PLAYER_UNREADY, null);
         sendMessage(MessagesIds.PLAYER_COUNT, null);
+        sendMessage(MessagesIds.GAME_RESET, null);
         startBtn.setText("Ready Up");
         startBtn.setBackground(new Color(144, 238, 144));
 
@@ -985,7 +994,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
         
     }
     public void checkPlayersAlive(){
-        if (playersAlive == 1){
+        if (playersAlive <= 1){
             if (!gameOverCooldown){
                 cooldown.startGameOverCooldown();
                 gameOverCooldown = true;
@@ -997,8 +1006,6 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
             }
             gameOverCooldown = false;
             gameOver = false;
-        } else if (playersAlive < 1){
-            gameOver = true;
         }
     }
     public void shieldHit(int damage){
@@ -1104,6 +1111,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                 if (weaponOffset < 50){
                     weaponOffset = 50;
                 }
+                currentPullOffset = weaponOffset;
             } else if (p1.getWeaponHit()){
                 if (weaponCooldownHit <= 0.09){
                     weaponOffset += 2;
@@ -1139,6 +1147,13 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
             cooldown.startPoisonCooldown();
         }
     }
+    public void playerDied(String enemyUsername){
+        p1.setPlayerSpectating(enemyUsername);
+        p1.setAlive(false);
+        if (!p1.getJoinLate()){
+            sendMessage(MessagesIds.PLAYER_DEAD, new Pair<String, String>(enemyUsername, p1.getUsername()));
+        }
+    }
     public void checkPoisoned(){
         if (p1.getPoison()){
             if (cooldown.getPoisonedCooldown() <= 3 && (cooldown.getPoisonedCooldown() == 1 || cooldown.getPoisonedCooldown() == 2 || cooldown.getPoisonedCooldown() == 3)){
@@ -1152,8 +1167,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                     p1.setDamageTaken(p1.getDamageTaken() + 10);
                     cooldown.startDamageTakenCooldown();
                     if (p1.getCurrentHealth() <= 0){
-                        p1.setPlayerSpectating(poisonUsername);
-                        p1.setAlive(false);
+                        playerDied(poisonUsername);
                     }
                 }
                 
@@ -1310,14 +1324,26 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                             p1.setSpeed(3);
                             p1.setRegularAbilityCooldown(7);
                         }
-
+                        
+                        boolean gameHasStarted = (boolean) fromServer.getValue();
+                        p1.setJoinLate(gameHasStarted);
+                        if (gameHasStarted){
+                            p1.setCurrentHealth(0);
+                        }
                         if (!reset){
                             Timer timer = new Timer();
                             timer.scheduleAtFixedRate(new TimerTask() {
                                 // int count = 0;
+                                // double startTime;
+                                // double endTime;
                                 @Override
                                 public void run(){
                                     // count++;
+                                    // endTime = System.currentTimeMillis();
+                                    // if (endTime - startTime > 11){
+                                    //     System.out.println(endTime - startTime);
+                                    // }
+                                    // startTime = System.currentTimeMillis();
                                     calcPlayerPos();
                                     moveProjectiles();
                                     changeKnifePos();
@@ -1341,6 +1367,9 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                         }
 
                         playersAlive = totalPlayers;
+                        if (gameHasStarted){
+                            playersAlive--;
+                        }
                         cooldown.reset();
                         cooldown.startRegularAbilityCooldown();
                         cooldown.startUltCooldown();
@@ -1355,6 +1384,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                         userNameInput.setVisible(false);
                         gameStart = true;
                         // playSound("Audio/BackgroundAudio.mp3");
+                        
                     }
                     break;
                 case PLAYER_OBJECT:
@@ -1400,7 +1430,11 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                     String removeUsername = (String) fromServer.getValue();
                     for (int i = 0; i < players.size(); i++){
                         Player currentPlayer = players.get(i);
-                        if (currentPlayer.getUsername().equals(removeUsername)){    
+                        if (currentPlayer.getUsername().equals(removeUsername)){   
+                            if (currentPlayer.getAlive()){
+                                playersAlive--;
+                                checkPlayersAlive();
+                            } 
                             players.remove(i);
                             if (p1.getPlayerSpectating().equals(removeUsername)){
                                 for (int j = 0; j < players.size(); j++){
@@ -1412,8 +1446,6 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                             break;
                         }
                     }
-                    playersAlive--;
-                    checkPlayersAlive();
                     break;
                 case PLAYER_FOUND:
                     String playerFoundUsername = (String) fromServer.getValue();
@@ -1423,8 +1455,10 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                     }
                     break;
                 case PLAYER_DEAD:
-                    String playerEliminatedUsername = (String) fromServer.getValue();
-                    if (p1.getUsername().equals(playerEliminatedUsername)){
+                    Pair<String, String> usernamesElimation = (Pair<String, String>) fromServer.getValue();
+                    String playerEliminationUsername = (String) usernamesElimation.getKey();
+                    String playerElimatedUsername = (String) usernamesElimation.getValue();
+                    if (p1.getUsername().equals(playerEliminationUsername)){
                         p1.incrementTotalElim();
                         
                         int healthIncrease = Math.round((float)(p1.getMaxHealth()*0.15));
@@ -1438,9 +1472,22 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                         p1.setPrimaryDamge(p1.getPrimaryDamage()+primaryDamageIncrease);
                         p1.setSecondaryDamage(p1.getSecondaryDamage()+setSecondaryDamage);
                         p1.setUltDamage(p1.getUltDamage()+ultDamageIncrease);
-                    } 
-                    playersAlive--;
-                    checkPlayersAlive();
+                        
+                    } else if (p1.getUsername().equals(playerElimatedUsername)){
+                        if (!p1.getJoinLate()){
+                            playersAlive--;
+                            checkPlayersAlive();
+                        }
+                    }
+                    for (int i = 0; i < players.size(); i++){
+                        Player currentPlayer = players.get(i);
+                        if (currentPlayer.getUsername().equals(playerElimatedUsername)){   
+                            if (!currentPlayer.getJoinLate()){
+                                playersAlive--;
+                                checkPlayersAlive();
+                            }
+                        }
+                    }
                     // else {
                     //     for (int i = 0; i < players.size(); i++){
                     //         if (players.get(i).getUsername().equals(playerEliminatedUsername)){
@@ -1475,7 +1522,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                 hitSword();
             } else if (p1.getHeroType() == 3 && cooldown.getFireRateCooldown() >= p1.getFireCooldown()){
                 cooldown.startHealingCooldown();
-                fireBullet(115, 30, 81, 8);
+                fireBullet(115, 30, 81, 9);
             } else if (p1.getHeroType() == 4 && cooldown.getFireRateCooldown() >= p1.getFireCooldown()){
                 cooldown.startHealingCooldown();
                 fireBullet(140, 24, 82, 10);
@@ -1599,20 +1646,23 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
     public void mousePressed(MouseEvent e) {
         if (gameStart && p1.getAlive()){
             if (p1.getHeroType() == 1){
-                if (e.getButton() == MouseEvent.BUTTON1) {          
-                    if (weaponCooldownHit >= p1.getFireCooldown() && !p1.getWeaponThrow()){
-                        firing = true;
+                if (e.getButton() == MouseEvent.BUTTON1) {      
+                    firing = true;    
+                    if (weaponCooldownHit >= p1.getFireCooldown() && !p1.getWeaponThrow()){   
                         hitDagger();
                     }
                 } else if (e.getButton() == MouseEvent.BUTTON3) {
                     if (cooldown.getFireRateCooldown() >= p1.getFireCooldown()*8  && !p1.getWeaponHit()){
                         fireDagger();
+                    } else if (p1.getWeaponThrow()){
+                        p1.setWeaponThrow(false);
+                        cooldown.setFireRateCooldown(p1.getFireCooldown()*6);
                     }
                 }
             } else if (p1.getHeroType() == 2){
-                if (e.getButton() == MouseEvent.BUTTON1) {          
-                    if (weaponCooldownHit >= p1.getFireCooldown() && !p1.getWeaponThrow() && !p1.getWeaponHit()){
-                        firing = true;
+                if (e.getButton() == MouseEvent.BUTTON1) {    
+                    firing = true;      
+                    if (weaponCooldownHit >= p1.getFireCooldown() && !p1.getWeaponThrow() && !p1.getWeaponHit()){  
                         hitSword();
                     }
                 } else if (e.getButton() == MouseEvent.BUTTON3) {
@@ -1625,7 +1675,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                 firing = true;
                 if (cooldown.getFireRateCooldown() >= p1.getFireCooldown()){
                     cooldown.startHealingCooldown();
-                    fireBullet(115, 30, 80, 8);
+                    fireBullet(115, 30, 80, 9);
                 }
             }
             else if (p1.getHeroType() == 4){
@@ -1665,25 +1715,27 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
             maxDamage = 55;
         }
         int minDamage = 1;
-        double damage = minDamage + (maxDamage - minDamage) * ((maxWeaponOffset - weaponOffset) / (maxWeaponOffset - minWeaponOffset));
+        double damage = minDamage + (maxDamage - minDamage) * ((maxWeaponOffset - currentPullOffset) / (maxWeaponOffset - minWeaponOffset));
         p1.setSecondaryDamage(Math.round((float)damage));
         
         double timeDashFactor = 0.013;
-        double velocityDashFactor = 0.33;
+        double velocityDashFactor = 0.4;
         if (p1.getUltStatus()){
-            velocityDashFactor = 0.8;
+            velocityDashFactor = 0.7;
         }
-        weaponAnimationTime = (73 - weaponOffset)*timeDashFactor;
-        xVelocity += (73 - weaponOffset)*Math.cos(p1.getMouseAngle()+Math.toRadians(-90))*velocityDashFactor;
-        yVelocity += (73 - weaponOffset)*Math.sin(p1.getMouseAngle()+Math.toRadians(-90))*velocityDashFactor;
+        weaponAnimationTime = (73 - currentPullOffset)*timeDashFactor;
+        xVelocity += (73 - currentPullOffset)*Math.cos(p1.getMouseAngle()+Math.toRadians(-90))*velocityDashFactor;
+        yVelocity += (73 - currentPullOffset)*Math.sin(p1.getMouseAngle()+Math.toRadians(-90))*velocityDashFactor;
         p1.incrementWeaponID();
+
+        currentPullOffset = 73;
+        p1.setWeaponHolding(false);
     }
 	public void mouseReleased(MouseEvent e) {
         firing = false;
         if (p1.getHeroType() == 2){
             if (p1.getWeaponHolding()){
                 shootSword();
-                p1.setWeaponHolding(false);
             }
         }
     }
@@ -1807,7 +1859,6 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
             }
             if (e.getKeyCode() == 16){
                 if (p1.getHeroType() == 2){
-                    p1.setWeaponHolding(false);
                     shootSword();
                 }
             }

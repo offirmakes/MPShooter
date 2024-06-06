@@ -6,7 +6,6 @@ public class Manager {
     public Manager(){
         threadList = new ArrayList<ServerThread>();
         gameStart = false;
-
     }
     public synchronized void add(ServerThread serverThread){
         threadList.add(serverThread);
@@ -48,14 +47,16 @@ public class Manager {
     }
     public synchronized void checkStartGame(){
         if (getTotalPlayerReady() >= 2 && getTotalPlayerReady() == threadSize()){
+            broadcast(MessagesIds.GAME_START, gameStart);
             gameStart = true;
-            broadcast(MessagesIds.GAME_START, null);
             // globalTime = new GlobalTime(this);
             // Thread globalTimeThread = new Thread(globalTime);
             // globalTimeThread.start();
         }
     }
-
+    public synchronized void resetGameStatus(){
+        gameStart = false;
+    }
     public synchronized int threadSize(){
         return threadList.size();
     }

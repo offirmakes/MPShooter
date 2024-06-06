@@ -4,7 +4,7 @@ public class Player implements Serializable{
     private int screenX, screenY, mapX, mapY, heroType, speed, weaponX, weaponY, primaryDamage, secondaryDamage, damageTaken, secondAbilityUses, ultDamage, maxHealth, currentHealth, weaponID, totalElim;
     private ArrayList<Bullet> bullets;
     private ArrayList<Grenade> grenades;
-    private boolean weaponThrow, weaponHit, weaponHolding;
+    private boolean weaponThrow, weaponHit, weaponHolding, joinLate;
     private double daggerAngle;
     private String playerSpectating;
     private double mouseAngle, fireCooldown, ultCooldown, ultDuration, regularAbilityCooldown;
@@ -29,6 +29,7 @@ public class Player implements Serializable{
         weaponHit = false;
         weaponHolding = false;
         alive = false;
+        joinLate = false;
         weaponID = 0;
         secondAbilityUses = 0;
         secondaryDamage = 0;
@@ -260,6 +261,12 @@ public class Player implements Serializable{
     }
     public boolean getWeaponHolding(){
         return weaponHolding;
+    }
+    public void setJoinLate(boolean joinLate){
+        this.joinLate = joinLate;
+    }
+    public boolean getJoinLate(){
+        return joinLate;
     }
     @Override
     public boolean equals(Object o){

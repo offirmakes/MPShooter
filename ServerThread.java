@@ -91,8 +91,11 @@ public class ServerThread implements Runnable {
                     manager.broadcast(MessagesIds.PLAYER_FOUND, playerFoundUsername);
                     break;
                 case PLAYER_DEAD:
-                    String playerDead = (String) input.getValue();
+                    Pair<String, String> playerDead = (Pair<String, String>) input.getValue();
                     manager.broadcast(MessagesIds.PLAYER_DEAD, playerDead);
+                    break;
+                case GAME_RESET:
+                    manager.resetGameStatus();
                     break;
             }
         }

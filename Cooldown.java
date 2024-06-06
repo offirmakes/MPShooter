@@ -62,6 +62,9 @@ public class Cooldown implements Runnable {
     public void startFireRateCooldown(){
         fireRateCooldown = 0;
     }
+    public void setFireRateCooldown(double fireRateCooldown){
+        this.fireRateCooldown = fireRateCooldown;
+    }
     public void changeFireRateCooldown(int fireRateCooldown){
         this.fireRateCooldown = fireRateCooldown;
     }
