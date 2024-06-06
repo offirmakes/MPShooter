@@ -723,27 +723,27 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                 if (p1.getHeroType() == 1){
                     g.setColor(Color.BLACK); // Draw Ult Cooldown
                     BufferedImage rotatedPlayerInvisible = transform(playerInvisible, Math.toRadians(-90));
-                    g.drawImage(rotatedPlayerInvisible, 1160, 810, null);
-                    g.drawString(Integer.toString(timeUntilUlt), 1202-((Integer.toString(timeUntilUlt)).length()-1)*5, 857);
-                    g.drawImage(dashIcon, 1150, 700, null);
-                    g.drawString(Integer.toString(regularAbilityCooldown), 1207-((Integer.toString(regularAbilityCooldown)).length()-1)*5, 760);
+                    g.drawImage(rotatedPlayerInvisible, 1160, 768, null);
+                    g.drawString(Integer.toString(timeUntilUlt), 1202-((Integer.toString(timeUntilUlt)).length()-1)*5, 815);
+                    g.drawImage(dashIcon, 1150, 650, null);
+                    g.drawString(Integer.toString(regularAbilityCooldown), 1207-((Integer.toString(regularAbilityCooldown)).length()-1)*5, 710);
                 } else if (p1.getHeroType() == 2){
-                    g.drawImage(ragePotion, 1162, 805, null);
-                    g.drawString(Integer.toString(timeUntilUlt), 1191-((Integer.toString(timeUntilUlt)).length()-1)*5, 860);
-                    g.drawImage(player, 1150, 700, null);
-                    g.drawImage(shield, 1150, 700, null);
-                    g.drawString(Integer.toString(regularAbilityCooldown), 1191-((Integer.toString(regularAbilityCooldown)).length()-1)*5, 752);
+                    g.drawImage(ragePotion, 1162, 765, null);
+                    g.drawString(Integer.toString(timeUntilUlt), 1191-((Integer.toString(timeUntilUlt)).length()-1)*5, 820);
+                    g.drawImage(player, 1150, 660, null);
+                    g.drawImage(shield, 1150, 660, null);
+                    g.drawString(Integer.toString(regularAbilityCooldown), 1191-((Integer.toString(regularAbilityCooldown)).length()-1)*5, 712);
                 } else if (p1.getHeroType() == 3){
                     BufferedImage rotatedMachineGun = transform(machineGun, Math.toRadians(-90));
-                    g.drawImage(rotatedMachineGun, 1125, 800, null);
-                    g.drawString(Integer.toString(timeUntilUlt), 1196-((Integer.toString(timeUntilUlt)).length()-1)*5, 857);
-                    g.drawImage(grenadeIcon, 1140, 690, null);
-                    g.drawString(Integer.toString(regularAbilityCooldown), 1191-((Integer.toString(regularAbilityCooldown)).length()-1)*5, 755);
+                    g.drawImage(rotatedMachineGun, 1125, 760, null);
+                    g.drawString(Integer.toString(timeUntilUlt), 1196-((Integer.toString(timeUntilUlt)).length()-1)*5, 817);
+                    g.drawImage(grenadeIcon, 1140, 650, null);
+                    g.drawString(Integer.toString(regularAbilityCooldown), 1191-((Integer.toString(regularAbilityCooldown)).length()-1)*5, 715);
                 } else if (p1.getHeroType() == 4){
-                    g.drawImage(teleportation, 1145, 798, null);
-                    g.drawString(Integer.toString(timeUntilUlt), 1196-((Integer.toString(timeUntilUlt)).length()-1)*5, 855);
-                    g.drawImage(poisonBulletIcon, 1149, 690, null);
-                    g.drawString(Integer.toString(regularAbilityCooldown), 1195-((Integer.toString(regularAbilityCooldown)).length()-1)*5, 755);
+                    g.drawImage(teleportation, 1145, 758, null);
+                    g.drawString(Integer.toString(timeUntilUlt), 1196-((Integer.toString(timeUntilUlt)).length()-1)*5, 815);
+                    g.drawImage(poisonBulletIcon, 1149, 650, null);
+                    g.drawString(Integer.toString(regularAbilityCooldown), 1195-((Integer.toString(regularAbilityCooldown)).length()-1)*5, 715);
                 }
                 if (p1.getDamageTaken() > 0){
                     g.setColor(Color.RED); // Draw Damage Taken Text
