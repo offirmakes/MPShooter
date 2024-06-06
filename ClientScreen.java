@@ -544,7 +544,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                                 rotatedEnemySniper = transform(sniper, currentPlayer.getMouseAngle());           
                                 g.drawImage(rotatedEnemySniper, currentPlayer.getWeaponX()-xDiff, currentPlayer.getWeaponY()-yDiff, null);
                             }
-                            g.drawString(currentPlayer.getUsername(), (currentPlayer.getMapX()-xDiff)-p1.getUsername().length()*5, (currentPlayer.getMapY()-yDiff)-80); // Draw Enemy Username
+                            g.drawString(currentPlayer.getUsername(), (currentPlayer.getMapX()-xDiff)-currentPlayer.getUsername().length()*5, (currentPlayer.getMapY()-yDiff)-80); // Draw Enemy Username
                             drawSmallHealthBar(g, currentPlayer.getMaxHealth(), currentPlayer.getCurrentHealth(), currentPlayer.getMapX()-p1.getMapX(), currentPlayer.getMapY()-p1.getMapY()); // Draw Health Bar
                             
                             if ((currentPlayer.getHeroType() == 1 && currentPlayer.getWeaponHit()) || (currentPlayer.getHeroType() == 2 && (currentPlayer.getWeaponHit() || (currentPlayer.getWeaponThrow() && !currentPlayer.getWeaponHolding())))){
@@ -655,7 +655,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                     cooldown.startDamageTakenCooldown();
                 }
     
-                g.drawString(p1.getUsername(), 645-p1.getUsername().length()*5, 400); // Displays Username
+                g.drawString(p1.getUsername(), 645-p1.getUsername().length()*4, 400); // Displays Username
     
                 ArrayList<Bullet> bullets = p1.getBullets(); // Draw Bullets
                 BufferedImage rotateBullet;
@@ -814,7 +814,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                         if (currentPlayer.getUsername().equals(p1.getPlayerSpectating())){
                             yDisplacementUsername = 50;
                         }
-                        g.drawString(currentPlayer.getUsername(), (currentPlayer.getMapX()-xDiff)-currentPlayer.getUsername().length()*5, (currentPlayer.getMapY()-yDiff)-yDisplacementUsername); // Draw Enemy Username
+                        g.drawString(currentPlayer.getUsername(), (currentPlayer.getMapX()-xDiff)-currentPlayer.getUsername().length()*4, (currentPlayer.getMapY()-yDiff)-yDisplacementUsername); // Draw Enemy Username
                         if (!currentPlayer.getUsername().equals(p1.getPlayerSpectating())){
                             drawSmallHealthBar(g, currentPlayer.getMaxHealth(), currentPlayer.getCurrentHealth(), currentPlayer.getMapX()-p1.getMapX(), currentPlayer.getMapY()-p1.getMapY());
                         }
@@ -883,7 +883,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
                 g.setColor(Color.YELLOW);
                 g.setFont(new Font("Arial", Font.BOLD, 30));
                 if (playersAlive == 1){
-                    g.drawString(playerAliveUsername + " Won!", 587 - playerAliveUsername.length()*7, 200);
+                    g.drawString(playerAliveUsername + " Won!", 610 - playerAliveUsername.length()*10, 200);
                 } else {
                     g.setColor(Color.WHITE);
                     g.drawString("Draw", 600, 200);
@@ -1238,7 +1238,7 @@ public class ClientScreen extends JPanel implements KeyListener, MouseListener, 
         inObj = new ObjectInputStream(serverSocket.getInputStream());
         
         while (true){
-            Pair<MessagesIds, Object>  fromServer = null;
+            Pair<MessagesIds, Object> fromServer = null;
             try {
                 fromServer = (Pair<MessagesIds, Object>) inObj.readObject(); 
             } catch (IOException e) {
